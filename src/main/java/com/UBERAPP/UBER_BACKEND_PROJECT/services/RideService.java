@@ -4,6 +4,7 @@ package com.UBERAPP.UBER_BACKEND_PROJECT.services;
 import com.UBERAPP.UBER_BACKEND_PROJECT.dto.RideRequestDTO;
 import com.UBERAPP.UBER_BACKEND_PROJECT.entities.Driver;
 import com.UBERAPP.UBER_BACKEND_PROJECT.entities.Ride;
+import com.UBERAPP.UBER_BACKEND_PROJECT.entities.RideRequest;
 import com.UBERAPP.UBER_BACKEND_PROJECT.entities.enums.RideStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -13,9 +14,9 @@ public interface RideService {
 
     void matchWithDrivers(RideRequestDTO rideRequestDto);
 
-    Ride createNewRide(RideRequestDTO rideRequestDto, Driver driver);
+    Ride createNewRide(RideRequest rideRequest, Driver driver);
 
-    Ride updateRideStatus(Long rideId, RideStatus rideStatus);
+    Ride updateRideStatus(Ride ride, RideStatus rideStatus);
 
     Page<Ride> getAllRidesOfRider(Long riderId, PageRequest pageRequest);
 

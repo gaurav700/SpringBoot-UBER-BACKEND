@@ -4,7 +4,6 @@ import com.UBERAPP.UBER_BACKEND_PROJECT.entities.Driver;
 import com.UBERAPP.UBER_BACKEND_PROJECT.entities.RideRequest;
 import com.UBERAPP.UBER_BACKEND_PROJECT.repositories.DriverRepository;
 import com.UBERAPP.UBER_BACKEND_PROJECT.strategies.DriverMatchingStrategy;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
@@ -19,7 +18,6 @@ public class DriverMatchingNearestDriverStrategy implements DriverMatchingStrate
 
     @Override
     public List<Driver> findMatchingDriver(RideRequest rideRequest) {
-
         return driverRepository.findTenNearestDrivers(rideRequest.getPickUpLocation());
     }
 }
