@@ -6,13 +6,13 @@ import com.UBERAPP.UBER_BACKEND_PROJECT.dto.RiderDTO;
 import com.UBERAPP.UBER_BACKEND_PROJECT.entities.Driver;
 import com.UBERAPP.UBER_BACKEND_PROJECT.entities.Ride;
 import com.UBERAPP.UBER_BACKEND_PROJECT.entities.RideRequest;
+import com.UBERAPP.UBER_BACKEND_PROJECT.entities.Rider;
 import com.UBERAPP.UBER_BACKEND_PROJECT.entities.enums.RideRequestStatus;
 import com.UBERAPP.UBER_BACKEND_PROJECT.entities.enums.RideStatus;
 import com.UBERAPP.UBER_BACKEND_PROJECT.exceptions.ResourceNotFoundException;
 import com.UBERAPP.UBER_BACKEND_PROJECT.repositories.DriverRepository;
-import com.UBERAPP.UBER_BACKEND_PROJECT.services.DriverService;
-import com.UBERAPP.UBER_BACKEND_PROJECT.services.RideRequestService;
-import com.UBERAPP.UBER_BACKEND_PROJECT.services.RideService;
+import com.UBERAPP.UBER_BACKEND_PROJECT.repositories.RiderRepository;
+import com.UBERAPP.UBER_BACKEND_PROJECT.services.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -32,6 +32,8 @@ public class DriverServiceImpl implements DriverService {
     private  final DriverRepository driverRepository;
     private final RideService rideService;
     private final ModelMapper modelMapper;
+    private final PaymentService paymentService;
+    private final RiderRepository riderRepository;
 
     @Override
     @Transactional
@@ -71,12 +73,32 @@ public class DriverServiceImpl implements DriverService {
         }
         ride.setStartAt(LocalDateTime.now());
         Ride savedRide = rideService.updateRideStatus(ride, RideStatus.ONGOING);
+        paymentService.createNewPayment(savedRide);
         return modelMapper.map(savedRide, RideDTO.class);
     }
 
     @Override
+    @Transactional
     public RideDTO endRide(Long rideId) {
-        return null;
+        Ride ride = rideService.getRideById(rideId);
+        Driver driver = getCurrentDriver();
+
+        if(!driver.equals(ride.getDriver())){
+            throw new RuntimeException("Driver cannot end the ride as he not accepted it earlier");
+        }
+
+        if(!ride.getRideStatus().equals(RideStatus.ONGOING)){
+            throw new RuntimeException("Driver cannot end the ride as the ride is not ONGOING");
+        }
+
+        ride.setEndedAt(LocalDateTime.now());
+        Ride savedRide = rideService.updateRideStatus(ride, RideStatus.ENDED);
+        updateDriverAvailability(driver, true);
+
+        paymentService.processPayment(ride);
+
+
+        return modelMapper.map(savedRide, RideDTO.class);
     }
 
     @Override
@@ -101,7 +123,14 @@ public class DriverServiceImpl implements DriverService {
 
     @Override
     public RiderDTO rateRider(Long rideId, Integer rating) {
-        return null;
+        Ride ride = rideService.getRideById(rideId);
+        Rider rider = ride.getRider();
+        Double currRating = rider.getRating();
+        Double newRating = 10 * currRating;
+        Double updatedRating = newRating / 11;
+        rider.setRating(updatedRating);
+        riderRepository.save(rider);
+        return modelMapper.map(rider, RiderDTO.class);
     }
 
     @Override

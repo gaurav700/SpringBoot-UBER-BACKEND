@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class WalletTransactionDTO {
     private Long id;
     private Double amount;
@@ -21,4 +22,5 @@ public class WalletTransactionDTO {
     private String transactionId;
     private WalletDTO wallet;
     private LocalDateTime timeStamp;
+
 }

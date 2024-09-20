@@ -8,6 +8,7 @@ import com.UBERAPP.UBER_BACKEND_PROJECT.entities.*;
 import com.UBERAPP.UBER_BACKEND_PROJECT.entities.enums.RideRequestStatus;
 import com.UBERAPP.UBER_BACKEND_PROJECT.entities.enums.RideStatus;
 import com.UBERAPP.UBER_BACKEND_PROJECT.exceptions.ResourceNotFoundException;
+import com.UBERAPP.UBER_BACKEND_PROJECT.repositories.DriverRepository;
 import com.UBERAPP.UBER_BACKEND_PROJECT.repositories.RideRequestRepository;
 import com.UBERAPP.UBER_BACKEND_PROJECT.repositories.RiderRepository;
 import com.UBERAPP.UBER_BACKEND_PROJECT.services.DriverService;
@@ -35,6 +36,7 @@ public class RiderServiceImpl implements RiderService {
     private final RiderRepository riderRepository;
     private final RideService rideService;
     private final DriverService driverService;
+    private final DriverRepository driverRepository;
 
     @Override
     @Transactional
@@ -76,7 +78,15 @@ public class RiderServiceImpl implements RiderService {
 
     @Override
     public DriverDTO rateRider(Long rideId, Integer rating) {
-        return null;
+        Ride ride = rideService.getRideById(rideId);
+        Driver driver = ride.getDriver();
+        Double currRating = driver.getRating();
+        Double newRating = 10 * currRating;
+        Double updatedRating = newRating / 11;
+        driver.setRating(updatedRating);
+        driverRepository.save(driver);
+        return modelMapper.map(driver, DriverDTO.class);
+
     }
 
     @Override

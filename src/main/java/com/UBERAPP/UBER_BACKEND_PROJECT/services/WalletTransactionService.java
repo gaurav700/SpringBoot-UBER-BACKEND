@@ -1,8 +1,8 @@
 package com.UBERAPP.UBER_BACKEND_PROJECT.services;
 
-import com.UBERAPP.UBER_BACKEND_PROJECT.dto.WalletTransactionDTO;
+import com.UBERAPP.UBER_BACKEND_PROJECT.entities.WalletTransaction;
 
 public interface WalletTransactionService {
 
-    void createNewWalletTransaction(WalletTransactionDTO walletTransactionDTO);
+    void createNewWalletTransaction(WalletTransaction walletTransaction);
 }
