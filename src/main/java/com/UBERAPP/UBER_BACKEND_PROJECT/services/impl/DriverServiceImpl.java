@@ -3,10 +3,7 @@ package com.UBERAPP.UBER_BACKEND_PROJECT.services.impl;
 import com.UBERAPP.UBER_BACKEND_PROJECT.dto.DriverDTO;
 import com.UBERAPP.UBER_BACKEND_PROJECT.dto.RideDTO;
 import com.UBERAPP.UBER_BACKEND_PROJECT.dto.RiderDTO;
-import com.UBERAPP.UBER_BACKEND_PROJECT.entities.Driver;
-import com.UBERAPP.UBER_BACKEND_PROJECT.entities.Ride;
-import com.UBERAPP.UBER_BACKEND_PROJECT.entities.RideRequest;
-import com.UBERAPP.UBER_BACKEND_PROJECT.entities.Rider;
+import com.UBERAPP.UBER_BACKEND_PROJECT.entities.*;
 import com.UBERAPP.UBER_BACKEND_PROJECT.entities.enums.RideRequestStatus;
 import com.UBERAPP.UBER_BACKEND_PROJECT.entities.enums.RideStatus;
 import com.UBERAPP.UBER_BACKEND_PROJECT.exceptions.ResourceNotFoundException;
@@ -34,6 +31,7 @@ public class DriverServiceImpl implements DriverService {
     private final ModelMapper modelMapper;
     private final PaymentService paymentService;
     private final RiderRepository riderRepository;
+    private final RatingService ratingService;
 
     @Override
     @Transactional
@@ -74,6 +72,7 @@ public class DriverServiceImpl implements DriverService {
         ride.setStartAt(LocalDateTime.now());
         Ride savedRide = rideService.updateRideStatus(ride, RideStatus.ONGOING);
         paymentService.createNewPayment(savedRide);
+        ratingService.createNewRating(savedRide);
         return modelMapper.map(savedRide, RideDTO.class);
     }
 
@@ -124,13 +123,17 @@ public class DriverServiceImpl implements DriverService {
     @Override
     public RiderDTO rateRider(Long rideId, Integer rating) {
         Ride ride = rideService.getRideById(rideId);
-        Rider rider = ride.getRider();
-        Double currRating = rider.getRating();
-        Double newRating = 10 * currRating;
-        Double updatedRating = newRating / 11;
-        rider.setRating(updatedRating);
-        riderRepository.save(rider);
-        return modelMapper.map(rider, RiderDTO.class);
+        Driver driver = getCurrentDriver();
+
+        if(!ride.getDriver().equals(driver)){
+            throw new RuntimeException("This ride doesn't belong to the current driver");
+        }
+
+        if(!ride.getRideStatus().equals(RideStatus.ENDED)){
+            throw new RuntimeException("Ride is not ended yet so you cannot give rating till then");
+        }
+
+        return ratingService.rateRider(ride, rating);
     }
 
     @Override
@@ -155,6 +158,11 @@ public class DriverServiceImpl implements DriverService {
     @Override
     public Driver updateDriverAvailability(Driver driver, boolean available) {
         driver.setAvailable(available);
+        return driverRepository.save(driver);
+    }
+
+    @Override
+    public Driver createNewDriver(Driver driver) {
         return driverRepository.save(driver);
     }
 }

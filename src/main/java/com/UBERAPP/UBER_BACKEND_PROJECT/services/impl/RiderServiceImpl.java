@@ -12,6 +12,7 @@ import com.UBERAPP.UBER_BACKEND_PROJECT.repositories.DriverRepository;
 import com.UBERAPP.UBER_BACKEND_PROJECT.repositories.RideRequestRepository;
 import com.UBERAPP.UBER_BACKEND_PROJECT.repositories.RiderRepository;
 import com.UBERAPP.UBER_BACKEND_PROJECT.services.DriverService;
+import com.UBERAPP.UBER_BACKEND_PROJECT.services.RatingService;
 import com.UBERAPP.UBER_BACKEND_PROJECT.services.RideService;
 import com.UBERAPP.UBER_BACKEND_PROJECT.services.RiderService;
 import com.UBERAPP.UBER_BACKEND_PROJECT.strategies.RideStrategyManager;
@@ -37,6 +38,7 @@ public class RiderServiceImpl implements RiderService {
     private final RideService rideService;
     private final DriverService driverService;
     private final DriverRepository driverRepository;
+    private final RatingService ratingService;
 
     @Override
     @Transactional
@@ -77,15 +79,19 @@ public class RiderServiceImpl implements RiderService {
     }
 
     @Override
-    public DriverDTO rateRider(Long rideId, Integer rating) {
+    public DriverDTO rateDriver(Long rideId, Integer rating) {
         Ride ride = rideService.getRideById(rideId);
-        Driver driver = ride.getDriver();
-        Double currRating = driver.getRating();
-        Double newRating = 10 * currRating;
-        Double updatedRating = newRating / 11;
-        driver.setRating(updatedRating);
-        driverRepository.save(driver);
-        return modelMapper.map(driver, DriverDTO.class);
+        Rider rider = getCurrentRider();
+
+        if(!ride.getRider().equals(rider)){
+            throw new RuntimeException("This ride doesn't belong to the current rider");
+        }
+
+        if(!ride.getRideStatus().equals(RideStatus.ENDED)){
+            throw new RuntimeException("Ride is not ended yet so you cannot give rating till then");
+        }
+
+        return ratingService.rateDriver(ride, rating);
 
     }
 

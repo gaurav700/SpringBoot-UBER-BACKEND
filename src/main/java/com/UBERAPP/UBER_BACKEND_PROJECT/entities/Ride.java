@@ -17,6 +17,10 @@ import java.time.LocalDateTime;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Table(indexes = {
+        @Index(name = "index_rider", columnList = "rider_id"),
+        @Index(name = "index_driver", columnList = "driver_id")
+})
 public class Ride {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

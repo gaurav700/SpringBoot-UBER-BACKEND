@@ -1,10 +1,7 @@
 package com.UBERAPP.UBER_BACKEND_PROJECT.services;
 
 
-import com.UBERAPP.UBER_BACKEND_PROJECT.dto.DriverDTO;
-import com.UBERAPP.UBER_BACKEND_PROJECT.dto.RideDTO;
-import com.UBERAPP.UBER_BACKEND_PROJECT.dto.RideRequestDTO;
-import com.UBERAPP.UBER_BACKEND_PROJECT.dto.RiderDTO;
+import com.UBERAPP.UBER_BACKEND_PROJECT.dto.*;
 import com.UBERAPP.UBER_BACKEND_PROJECT.entities.Rider;
 import com.UBERAPP.UBER_BACKEND_PROJECT.entities.User;
 import org.springframework.data.domain.Page;
@@ -17,7 +14,7 @@ public interface RiderService {
 
     RideDTO cancelRide(Long rideId);
 
-    DriverDTO rateRider(Long rideId, Integer rating);
+    DriverDTO rateDriver(Long rideId, Integer rating);
 
     RiderDTO getMyProfile();
 
@@ -26,6 +23,5 @@ public interface RiderService {
     Rider createNewRider(User user);
 
     Rider getCurrentRider();
-
 }
 

@@ -4,11 +4,14 @@ package com.UBERAPP.UBER_BACKEND_PROJECT.services.impl;
 import com.UBERAPP.UBER_BACKEND_PROJECT.dto.DriverDTO;
 import com.UBERAPP.UBER_BACKEND_PROJECT.dto.SignUpDTO;
 import com.UBERAPP.UBER_BACKEND_PROJECT.dto.UserDTO;
+import com.UBERAPP.UBER_BACKEND_PROJECT.entities.Driver;
 import com.UBERAPP.UBER_BACKEND_PROJECT.entities.User;
 import com.UBERAPP.UBER_BACKEND_PROJECT.entities.enums.Role;
+import com.UBERAPP.UBER_BACKEND_PROJECT.exceptions.ResourceNotFoundException;
 import com.UBERAPP.UBER_BACKEND_PROJECT.exceptions.RuntimeConflictException;
 import com.UBERAPP.UBER_BACKEND_PROJECT.repositories.UserRepository;
 import com.UBERAPP.UBER_BACKEND_PROJECT.services.AuthService;
+import com.UBERAPP.UBER_BACKEND_PROJECT.services.DriverService;
 import com.UBERAPP.UBER_BACKEND_PROJECT.services.RiderService;
 import com.UBERAPP.UBER_BACKEND_PROJECT.services.WalletService;
 import jakarta.transaction.Transactional;
@@ -26,6 +29,7 @@ public class AuthServiceImpl implements AuthService {
     private final UserRepository userRepository;
     private final RiderService riderService;
     private final WalletService walletService;
+    private final DriverService driverService;
 
     @Override
     public String login(String email, String password) {
@@ -55,7 +59,22 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public DriverDTO onBoardNewDriver(Long userId) {
-        return null;
+    public DriverDTO onBoardNewDriver(Long userId, String vehicleId) {
+        User user = userRepository.findById(userId).orElseThrow(()-> new ResourceNotFoundException("User not found with id :"+userId));
+
+        if(user.getRoles().contains(Role.DRIVER)){
+            throw new RuntimeException("User is already a Driver");
+        }
+
+        Driver driver = Driver.builder()
+                .user(user)
+                .rating(0.0)
+                .vehicleId(vehicleId)
+                .available(true)
+                .build();
+        user.getRoles().add(Role.DRIVER);
+        userRepository.save(user);
+        Driver savedDriver = driverService.createNewDriver(driver);
+        return modelMapper.map(savedDriver, DriverDTO.class);
     }
 }
