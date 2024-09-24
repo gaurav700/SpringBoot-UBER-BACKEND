@@ -22,9 +22,10 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class WalletServiceImpl implements WalletService {
 
-    private WalletRepository walletRepository;
-    private ModelMapper modelMapper;
+    private final WalletRepository walletRepository;
+    private final ModelMapper modelMapper;
     private final WalletTransactionService walletTransactionService;
+
     @Override
     @Transactional
     public Wallet addMoneyToWallet(User user, Double amount, String transactionId, Ride ride, TransactionMethod  transactionMethod) {
@@ -59,7 +60,6 @@ public class WalletServiceImpl implements WalletService {
                 .amount(amount)
                 .build();
         wallet.getTransactions().add(walletTransaction);
-//        walletTransactionService.createNewWalletTransaction(walletTransaction);
         return walletRepository.save(wallet);
     }
 
