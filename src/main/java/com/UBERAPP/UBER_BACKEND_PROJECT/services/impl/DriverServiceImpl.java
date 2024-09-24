@@ -16,6 +16,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -30,7 +31,6 @@ public class DriverServiceImpl implements DriverService {
     private final RideService rideService;
     private final ModelMapper modelMapper;
     private final PaymentService paymentService;
-    private final RiderRepository riderRepository;
     private final RatingService ratingService;
 
     @Override
@@ -47,8 +47,7 @@ public class DriverServiceImpl implements DriverService {
         }
 
         rideService.updateRideStatus(ride, RideStatus.CANCELLED);
-        Driver savedDriver = updateDriverAvailability(driver, true);
-        driverRepository.save(savedDriver);
+        updateDriverAvailability(driver, true);
         return modelMapper.map(ride, RideDTO.class);
     }
 
@@ -115,8 +114,7 @@ public class DriverServiceImpl implements DriverService {
             throw new RuntimeException("Driver is cannot accept ride due to unavailability");
         }
         Driver savedDriver = updateDriverAvailability(currentDriver, false);
-        Driver savedDrivers = driverRepository.save(savedDriver);
-        Ride ride = rideService.createNewRide(rideRequest, savedDrivers);
+        Ride ride = rideService.createNewRide(rideRequest, savedDriver);
         return modelMapper.map(ride, RideDTO.class) ;
     }
 
@@ -152,7 +150,10 @@ public class DriverServiceImpl implements DriverService {
 
     @Override
     public Driver getCurrentDriver(){
-        return driverRepository.findById(2L).orElseThrow(()-> new ResourceNotFoundException("Driver not found with id : 2"));
+        User user = (User) SecurityContextHolder
+                .getContext().getAuthentication().getPrincipal();
+        return driverRepository.findByUser(user).orElseThrow(()-> new ResourceNotFoundException("Driver not associated with user with " +
+                "id "+user.getId()));
     }
 
     @Override
