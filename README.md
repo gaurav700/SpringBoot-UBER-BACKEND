@@ -9,12 +9,7 @@ This project is a backend service built using Spring Boot for managing a ride-ha
 2. [Technologies Used](#technologies-used)
 3. [Prerequisites](#prerequisites)
 4. [Configuration](#configuration)
-5. [Database Setup](#database-setup)
-6. [Running the Project](#running-the-project)
-7. [Database Schema](#database-schema)
-8. [JWT Security](#jwt-security)
-9. [Mail Configuration](#mail-configuration)
-10. [Data Initialization](#data-initialization)
+5. [JWT Security](#jwt-security)
 
 ---
 
@@ -88,13 +83,15 @@ spring.mail.properties.mail.smtp.starttls.enable=true
 JWT Security
 - JWT (JSON Web Tokens) is used for user authentication. The secret key for signing tokens is stored in the application.properties file:
 properties:
-- jwt.secretKey=<your-secret-key>
+- ``` jwt.secretKey=<your-secret-key> ```
 How JWT is Used:
 - When users log in, they receive a JWT token that they need to include in the Authorization header of every request.
 - The token is signed using the secret key and helps identify users for protected endpoints.
 - Example Authorization Header:
-    Authorization: Bearer <jwt-token>
+    ``` Authorization: Bearer <jwt-token> ```
     The JWT is verified with each request. If the token is invalid or expired, the server will return a 401 Unauthorized error.
+
+
 
   
 
