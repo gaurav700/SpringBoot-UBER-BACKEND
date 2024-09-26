@@ -83,4 +83,19 @@ spring.mail.port=587
 spring.mail.properties.mail.smtp.auth=true
 spring.mail.properties.mail.smtp.starttls.enable=true
 
+```
+
+JWT Security
+- JWT (JSON Web Tokens) is used for user authentication. The secret key for signing tokens is stored in the application.properties file:
+properties:
+- jwt.secretKey=<your-secret-key>
+How JWT is Used:
+- When users log in, they receive a JWT token that they need to include in the Authorization header of every request.
+- The token is signed using the secret key and helps identify users for protected endpoints.
+- Example Authorization Header:
+    Authorization: Bearer <jwt-token>
+    The JWT is verified with each request. If the token is invalid or expired, the server will return a 401 Unauthorized error.
+
+  
+
 
