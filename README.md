@@ -80,7 +80,7 @@ spring.mail.properties.mail.smtp.starttls.enable=true
 
 ```
 
-JWT Security
+## JWT Security
 - JWT (JSON Web Tokens) is used for user authentication. The secret key for signing tokens is stored in the application.properties file:
 properties:
 - ``` jwt.secretKey=<your-secret-key> ```
