@@ -92,7 +92,31 @@ How JWT is Used:
     The JWT is verified with each request. If the token is invalid or expired, the server will return a 401 Unauthorized error.
 
 
+# 🐳 Run via Docker (Recommended)
 
+## 🔹 Pull and Run the Image
+
+```bash
+docker pull gaurav375/uber-backend:v1
+docker run -p 8080:8080 gaurav375/uber-backend
+```
+
+Visit the app at: 👉 `http://localhost:8080/swagger-ui/index.html`
+
+## 🔹 Run with PostgreSQL via Docker Compose
+
+1. Clone the repository:
+
+```bash
+git clone https://github.com/gaurav700/SpringBoot-UBER-BACKEND
+cd SpringBoot-UBER-BACKEND
+```
+
+2. Run the containers:
+
+```bash
+docker compose up --build
+```
   
 
 
